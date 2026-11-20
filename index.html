@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Ceny Lusi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Jedna kategoria na ekran, telefon w pierwszej kolejności. Same kliknięcia, bez kont. */
+:root{
+  --bg:#f5f4f7; --surface:#fff; --ink:#24202b; --muted:#6c6577; --line:#e1dde7;
+  --accent:#8c2f57; --accent-ink:#fff; --accent-soft:#f4e6ed; --ok:#2f7a54;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#17151b; --surface:#211e26; --ink:#eeeaf2; --muted:#a39cad; --line:#37323e;
+  --accent:#e083aa; --accent-ink:#1b1418; --accent-soft:#3a2330; --ok:#6cc596; color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.5 var(--body);-webkit-text-size-adjust:100%}
+.wrap{max-width:640px;margin:0 auto;padding-block:max(20px,env(safe-area-inset-top,0px)) max(40px,env(safe-area-inset-bottom,0px));padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.top b{font:700 18px/1 var(--display)}
+.top span{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:22px}
+.eyebrow{font:600 12px/1 var(--body);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h1,h2{font-family:var(--display);margin:6px 0 0;text-wrap:balance}
+h1{font-size:28px;line-height:1.1}
+h2{font-size:24px;line-height:1.15}
+p{margin:0}
+.muted{color:var(--muted)}
+.examples{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.examples span{font-size:13px;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:3px 8px;color:var(--muted)}
+.q{display:flex;flex-direction:column;gap:10px}
+.q > b{font-weight:600}
+.q small{color:var(--muted);font-size:13.5px;margin-top:-6px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;min-width:58px;padding:10px 12px;font:500 15px/1 var(--body);font-variant-numeric:tabular-nums;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.chip:focus-visible,.btn:focus-visible,textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.other{display:flex;align-items:center;gap:8px}
+.other input{width:110px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
+textarea{width:100%;min-height:70px;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;resize:vertical}
+.nav{display:flex;gap:10px;flex-wrap:wrap}
+.btn{appearance:none;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:12px;padding:13px 18px;font:600 15px/1 var(--body);cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);flex:1}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.btn.link{border:0;background:none;color:var(--muted);padding:13px 6px;text-decoration:underline}
+.err{color:#b4462a;font-size:14px}
+.summary{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.summary li{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14.5px}
+.summary li span:last-child{color:var(--muted);text-align:right;font-variant-numeric:tabular-nums;flex:none}
+.summary button{appearance:none;border:0;background:none;color:var(--ink);font:inherit;text-align:left;padding:0;cursor:pointer;text-decoration:underline;text-decoration-color:var(--line)}
+.ok{color:var(--ok);font-weight:600}
+pre{white-space:pre-wrap;word-break:break-word;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;font-size:12.5px;max-height:180px;overflow:auto}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><b>Ceny Lusi</b><span id="count"></span></div>
+  <div class="bar"><i id="fill"></i></div>
+  <main id="app" class="card" aria-live="polite"></main>
+</div>
+<script>
+const QUESTIONS = [{"group":"nisza","key":"kaszmir_sweter_damski","label":"Sweter kaszmirowy damski","hint":"100% kaszmir albo z dużą domieszką, bez znanej metki","examples":["Cashmere Lady Sweaters"]},{"group":"nisza","key":"kaszmir_szal","label":"Szal kaszmirowy","hint":"","examples":["Cashmere Scarves"]},{"group":"nisza","key":"moher_sweter_damski","label":"Sweter moherowy damski","hint":"dziś skaner liczy 90–120 zł","examples":["MIX MOHAIR JUMPERS"]},{"group":"nisza","key":"welna_sweter_damski","label":"Sweter wełniany damski","hint":"wełna, merino, norweski, warkocze","examples":["Fisherman Wool Sweaters Grade B","MIX NORDIC JUMPERS"]},{"group":"nisza","key":"welna_sweter","label":"Sweter wełniany męski","hint":"rybacki, norweski, Aran","examples":["Fisherman Wool Sweaters Grade B","MIX NORDIC JUMPERS"]},{"group":"nisza","key":"welna_szal","label":"Szal wełniany","hint":"","examples":["MIX SCARVES 100% WOOL"]},{"group":"nisza","key":"bez_marki_plaszcz_damski","label":"Płaszcz damski","hint":"wełniany, flauszowy, trencz – mix","examples":["Płaszcze damskie + męskie – 20kg"]},{"group":"nisza","key":"bez_marki_plaszcz","label":"Płaszcz (mix damskie + męskie)","hint":"jak w workach Ecotexu „Płaszcze – 20 kg”","examples":["Płaszcze – 20kg","Płaszcze damskie + męskie – 20kg","MIX EXPERT COATS BALE 35KG","MIX VINTAGE COATS"]},{"group":"nisza","key":"skora_kurtka_damski","label":"Kurtka skórzana damska","hint":"","examples":["MIX LEATHER WOMEN JACKETS","15X LADIES LEATHER JACKETS"]},{"group":"nisza","key":"skora_kurtka","label":"Kurtka skórzana męska","hint":"","examples":["Leather Jackets","MIX DOUBLE BREASTED LEATHER JACKETS","MIX LEATHER WOMEN JACKETS","MIX LEATHER MEN JACKETS"]},{"group":"nisza","key":"skora_plaszcz","label":"Płaszcz skórzany (długi)","hint":"","examples":["10X LEATHER LONG COATS"]},{"group":"nisza","key":"kozuch_kurtka","label":"Kożuch / kurtka z owczej skóry","hint":"sheepskin, shearling","examples":["Sheepskin Jackets Grade B"]},{"group":"nisza","key":"kozuch_plaszcz","label":"Długi kożuch","hint":"","examples":["MIX LEATHER SHEARLING COATS"]},{"group":"ogolne","key":"bez_marki_sweter_damski","label":"Sweter damski bez marki","hint":"sieciówki, mix składów","examples":["Swetry damskie – 25kg","Swetry damskie i męskie – pakiet 10 sztuk","Spodnie + swetry damskie i męskie – pakiet 10 sztuk","Lady Cardigan Sweaters"]},{"group":"ogolne","key":"bez_marki_sweter","label":"Sweter męski / unisex bez marki","hint":"90's, cable knit, mix","examples":["Swetry damskie – 25kg","Swetry damskie i męskie – pakiet 10 sztuk","Spodnie + swetry damskie i męskie – pakiet 10 sztuk","Box Jerseys NBA / NFL · 15 pcs"]},{"group":"ogolne","key":"bez_marki_sukienka_damski","label":"Sukienka bez marki","hint":"","examples":["Sukienki damskie – 25kg","Flower Dresses","Y2K Dresses","MIX SEXY MINI DRESSES"]},{"group":"ogolne","key":"bez_marki_marynarka_damski","label":"Marynarka damska bez marki","hint":"","examples":["Marynarki damskie – 25kg","MIX SUMMER BLAZERS FOR WOMAN","MIX WINTER BLAZERS FOR WOMAN"]},{"group":"ogolne","key":"bez_marki_kurtka_damski","label":"Kurtka damska bez marki","hint":"zimowa, przejściowa","examples":["Kurtki zimowe damskie + męskie – 20kg","Kurtki poliestrowe damskie + męskie – 25kg","Kurtki bawełniane damskie + męskie – 25kg"]},{"group":"ogolne","key":"bez_marki_kurtka","label":"Kurtka męska bez marki","hint":"workwear, wiatrówki, mix","examples":["Kurtki zimowe damskie + męskie – 20kg","Kurtki poliestrowe damskie + męskie – 25kg","Kurtki bawełniane damskie + męskie – 25kg","30x DISNEY FLEECE JACKETS/SWEATERS"]},{"group":"ogolne","key":"bez_marki_jeansowa_damski","label":"Kurtka jeansowa damska","hint":"","examples":["25X LADIES DENIM JACKETS"]},{"group":"ogolne","key":"bez_marki_jeansowa","label":"Kurtka jeansowa męska","hint":"","examples":["Box Vestes en jeans · 15 pcs","MIX DENIM LLW JACKETS","MIX VINTAGE DENIM JACKETS","25X LADIES DENIM JACKETS"]},{"group":"ogolne","key":"bez_marki_bluza","label":"Bluza bez marki","hint":"sweatshirt, hoodie, college/USA","examples":["Bluzy bez kaptura damskie + męskie – 25kg","Bluzy damskie i męskie – pakiet 10 sztuk","Box 15 Sweats Premium","Box 15 Sweats Sportswear"]},{"group":"ogolne","key":"bez_marki_polar","label":"Polar bez marki","hint":"","examples":["Ballot 50 polaires","30x DISNEY FLEECE JACKETS/SWEATERS","MIX CRAZY FLEECES GRADE B","MIX POLAR JACKETS"]},{"group":"ogolne","key":"bez_marki_szal","label":"Szal / apaszka bez marki","hint":"","examples":["Apaszki + szale – 25kg","Unbranded Scarves","MIX FOX FUR SCARVES","MIX SCARVES VINTAGE"]},{"group":"ogolne","key":"bez_marki_tshirt","label":"T-shirt z nadrukiem","hint":"band, NASCAR, printy","examples":["Koszulki sportowe NBA / NFL – pakiet 25 szt","Animal Print Tees","Black Printed Tees","Lady Striped Tees"]},{"group":"marki","key":"lrl_sweter_damski","label":"Sweter Lauren Ralph Lauren damski","hint":"dziś skaner liczy 78–100 zł","examples":["Lauren Ralph Lauren Sweaters","Lauren Ralph Lauren Sweaters Grade B","BLACK FRIDAY DROP 25x Pièces Pull Ralph Lauren Femme (FAST DIPSATCH)","BLACK FRIDAY DROP  30x Pièces Pull Ralph Lauren/Tommy Hilfiger femme (FAST DISPATCH)"]},{"group":"marki","key":"calvin_sweter","label":"Sweter Calvin Klein","hint":"","examples":["30x CALVIN KLEIN SWEATERS","CALVIN KLEIN SWEATERS BALE (50 PIECES)","Calvin Klein Sweaters"]},{"group":"marki","key":"nautica_sweter","label":"Sweter Nautica","hint":"","examples":["Nautica Sweaters","30X MEN'S NAUTICA SWEATERS","25X NAUTICA ROUND NECK SWEATER","40X NAUTICA QUARTER-ZIP SWEATERS"]},{"group":"marki","key":"lacoste_sweter","label":"Sweter Lacoste","hint":"","examples":["10x LACOSTE SWEATERS"]},{"group":"marki","key":"llbean_sweter","label":"Sweter L.L.Bean","hint":"","examples":["30x L.L.BEAN SWEATERS"]},{"group":"marki","key":"fredperry_sweter","label":"Sweter Fred Perry","hint":"","examples":["MIX FRED PERRY JUMPERS"]},{"group":"marki","key":"tommy_polo","label":"Polo Tommy Hilfiger","hint":"","examples":["30x TOMMY HILFIGER POLOS GRADE B","MIX TOMMY HILFIGER POLOS","25X POLO TOMMY SWEATS & HOODIES GRADE B"]},{"group":"marki","key":"rl_polo","label":"Polo Ralph Lauren","hint":"","examples":["30x RALPH LAUREN POLO GRADE B","Ralph Lauren & Tommy Hilfiger Polos Grade B","Ralph Lauren & Tommy Hilfiger Polos","MIX RALPH LAUREN POLOS GRADE B/C"]},{"group":"marki","key":"tommy_kurtka","label":"Kurtka Tommy Hilfiger","hint":"","examples":["10x TOMMY HILFIGER JACKETS GRADE B"]},{"group":"marki","key":"nike_bluza","label":"Bluza Nike","hint":"","examples":["Précommande · Box Sweats Nike · 15 pcs","Nike Hoodies & Sweatshirts","MIX DEAD STOCK NIKE SWEATSHIRTS","25X NIKE SWEATS AND HOODIES (GRADE B)"]},{"group":"marki","key":"champion_bluza","label":"Bluza Champion","hint":"","examples":["Champion Hoodies & Sweatshirts","MIX CHAMPION HOODIES/SWEATSHIRTS","25X CHAMPION SWEATSHIRTS/ HOODIES","Mix 10kg Sweatshirt Champion"]},{"group":"marki","key":"russell_bluza","label":"Bluza Russell Athletic","hint":"","examples":["10x RUSSELL SWEATSHIRTS GRADE B","Russell Sweatshirts","MIX RUSSELL SWEATSHIRTS","25X RUSSELL PLAIN SWEATSHIRTS/HOODIES"]},{"group":"marki","key":"carhartt_bluza","label":"Bluza Carhartt","hint":"","examples":["10x CARHARTT SWEATSHIRTS GRADE B/C","25X CARHARTT & DICKIES SWEAT HOODIES (GRADE B/C)"]},{"group":"marki","key":"dickies_kurtka","label":"Kurtka Dickies","hint":"","examples":["10x DICKIES JACKETS","MIX DICKIES JACKETS"]}];
+const GROUPS = {nisza:"Twoja nisza", ogolne:"Bez marki", marki:"Marki"};
+const PRICES = [20,30,40,50,60,70,80,100,120,150,180,200,250,300,400];
+const WASTE = [["0","0"],["1","1"],["2","2"],["3","3"],["4","4"],["5","5 i więcej"]];
+const DEPENDS = ["marka / metka","skład","stan","rozmiar","fason","kolor","sezon"];
+const KEY = "lumpx-ceny-v1";
+
+let state = load();           // {answers:{key:{typ,min,waste,dep:[],note,skip}}, idx}
+const app = document.getElementById("app");
+
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY)) || {answers:{}, idx:-1}; }catch{ return {answers:{}, idx:-1}; } }
+function persist(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch{} }
+function el(tag, props={}, ...kids){ const e=document.createElement(tag); Object.assign(e, props); kids.flat().forEach(k=>e.append(k)); return e; }
+function answered(){ return QUESTIONS.filter(q=>state.answers[q.key]).length; }
+
+function header(){
+  const n=answered();
+  document.getElementById("count").textContent = state.idx<0 ? "" : `${n} z ${QUESTIONS.length}`;
+  document.getElementById("fill").style.width = (100*n/QUESTIONS.length)+"%";
+}
+
+function chips(values, selected, onPick, label){
+  const box=el("div",{className:"chips",role:"group"}); box.setAttribute("aria-label",label);
+  values.forEach(([v,t])=>{ const b=el("button",{type:"button",className:"chip",textContent:t});
+    b.setAttribute("aria-pressed", String(selected===v)); b.onclick=()=>onPick(v); box.append(b); });
+  return box;
+}
+
+function intro(){
+  app.replaceChildren(
+    el("div",{}, el("div",{className:"eyebrow",textContent:"Dla skanera paczek"}), el("h1",{textContent:"Za ile to schodzi na Vinted?"})),
+    el("p",{textContent:`${QUESTIONS.length} rodzajów rzeczy, które pojawiają się w hurtowniach. Przy każdym klikasz, za ile zwykle sprzedajesz taką rzecz, za ile najtaniej puszczasz słabszą sztukę i ile z 10 takich rzeczy by się nie sprzedało. Jak nie wiesz, pomijasz.`}),
+    el("p",{className:"muted",textContent:"Zajmie to około 10 minut. Możesz przerwać w każdej chwili, telefon zapamięta, gdzie skończyłaś. Na końcu jednym przyciskiem wysyłasz odpowiedzi na grupę na Telegramie."}),
+    el("div",{className:"nav"}, el("button",{type:"button",className:"btn primary",textContent: answered()? "Wracam do ankiety":"Zaczynamy",onclick:()=>go(firstOpen())}))
+  );
+  header();
+}
+
+function firstOpen(){ const i=QUESTIONS.findIndex(q=>!state.answers[q.key]); return i<0 ? QUESTIONS.length : i; }
+
+function go(i){ state.idx=i; persist(); window.scrollTo({top:0}); if(i>=QUESTIONS.length) return summary(); question(); }
+
+function question(){
+  const q=QUESTIONS[state.idx];
+  const a=Object.assign({typ:null,min:null,waste:null,dep:[],note:""}, state.answers[q.key]?.skip ? {} : state.answers[q.key]);
+  const draw=()=>{
+    const priceChips=(field,max)=>{
+      const vals=PRICES.filter(p=>max==null||p<=max).map(p=>[p,`${p} zł`]);
+      const wrap=el("div",{className:"q"});
+      wrap.append(chips(vals,a[field],v=>{a[field]=v; if(field==="typ"&&a.min!=null&&a.min>v)a.min=null; draw();}, field));
+      const inp=el("input",{type:"number",inputMode:"numeric",min:1,id:`other-${field}`,placeholder:"inna",value: a[field]!=null && !PRICES.includes(a[field]) ? a[field] : ""});
+      inp.onchange=()=>{const v=Math.round(Number(inp.value)); a[field]=v>0?v:null; draw();};
+      wrap.append(el("label",{className:"other"}, inp, " zł"));
+      return wrap;
+    };
+    const ok = a.typ && a.min && a.waste!=null;
+    const next=el("button",{type:"button",className:"btn primary",textContent:"Dalej",disabled:!ok});
+    next.onclick=()=>{ state.answers[q.key]={typ:a.typ,min:a.min,waste:a.waste,dep:a.dep,note:a.note.trim()}; go(state.idx+1); };
+    const note=el("textarea",{id:"note",value:a.note,placeholder:"np. z metką Max Mara nawet 300 zł, sieciówka 40"}); note.oninput=()=>{a.note=note.value;};
+    const depBox=el("div",{className:"chips"});
+    DEPENDS.forEach(d=>{ const b=el("button",{type:"button",className:"chip",textContent:d}); b.setAttribute("aria-pressed",String(a.dep.includes(d)));
+      b.onclick=()=>{ a.dep=a.dep.includes(d)?a.dep.filter(x=>x!==d):[...a.dep,d]; b.setAttribute("aria-pressed",String(a.dep.includes(d))); }; depBox.append(b); });
+    app.replaceChildren(
+      el("div",{}, el("div",{className:"eyebrow",textContent:`${GROUPS[q.group]} · ${state.idx+1} z ${QUESTIONS.length}`}), el("h2",{textContent:q.label}),
+         q.hint? el("p",{className:"muted",textContent:q.hint}) : "",
+         el("div",{className:"examples"}, q.examples.map(t=>el("span",{textContent:t})))),
+      el("div",{className:"q"}, el("b",{textContent:"1. Za ile zwykle sprzedajesz taką rzecz?"}), el("small",{textContent:"typowa sztuka w dobrym stanie"}), priceChips("typ",null)),
+      el("div",{className:"q"}, el("b",{textContent:"2. A słabszą sztukę – najtaniej za ile puszczasz?"}), el("small",{textContent:"gorsza metka, mała wada, mniej modny fason"}), priceChips("min",a.typ)),
+      el("div",{className:"q"}, el("b",{textContent:"3. Z 10 takich rzeczy z paczki ile by się nie sprzedało?"}), el("small",{textContent:"dziury, plamy, nikt nie kupi"}),
+         chips(WASTE,a.waste,v=>{a.waste=v; draw();},"odpad")),
+      el("div",{className:"q"}, el("b",{textContent:"Od czego to zależy? (nieobowiązkowe)"}), depBox, note),
+      el("div",{className:"nav"},
+        el("button",{type:"button",className:"btn",textContent:"Wstecz",onclick:()=>go(state.idx-1)}),
+        next),
+      el("button",{type:"button",className:"btn link",textContent:"Nie wiem, pomiń",onclick:()=>{ state.answers[q.key]={skip:true}; go(state.idx+1); }})
+    );
+    if(state.idx===0) app.querySelector(".nav .btn").disabled=true;
+    header();
+  };
+  draw();
+}
+
+function encode(){
+  const lines = QUESTIONS.filter(q=>state.answers[q.key]).map(q=>{
+    const a=state.answers[q.key];
+    if(a.skip) return `${q.key}|pomiń`;
+    const clean=s=>s.replace(/[|\n]+/g," ").slice(0,140);
+    return [q.key,a.typ,a.min,a.waste,(a.dep||[]).join(","),clean(a.note||"")].join("|");
+  });
+  // Telegram: do 4096 znaków na wiadomość – dzielimy z zapasem
+  const parts=[]; let cur=[];
+  for(const l of lines){ if((cur.join("\n")+l).length>3200){parts.push(cur); cur=[];} cur.push(l); }
+  if(cur.length) parts.push(cur);
+  return parts.map((p,i)=>`LUMPX-ANKIETA ${i+1}/${parts.length}\n`+p.join("\n"));
+}
+
+function summary(){
+  const list=el("ul",{className:"summary"});
+  QUESTIONS.forEach((q,i)=>{ const a=state.answers[q.key];
+    const txt = !a ? "brak" : a.skip ? "pominięte" : `${a.min}–${a.typ} zł, odpad ${a.waste==="5"?"5+":a.waste}/10`;
+    list.append(el("li",{}, el("span",{}, el("button",{type:"button",textContent:q.label,onclick:()=>go(i)})), el("span",{textContent:txt}))); });
+  const msgs=encode(), missing=QUESTIONS.length-answered();
+  const sendBox=el("div",{className:"q"});
+  msgs.forEach((m,i)=>{
+    const tg=el("a",{className:"btn primary",href:"https://t.me/share/url?url="+encodeURIComponent(m),target:"_blank",rel:"noopener",
+      textContent: msgs.length>1 ? `Wyślij na Telegram (część ${i+1} z ${msgs.length})` : "Wyślij odpowiedzi na Telegram"});
+    tg.style.textAlign="center"; tg.style.textDecoration="none";
+    const copy=el("button",{type:"button",className:"btn",textContent:"Skopiuj tekst"});
+    copy.onclick=async()=>{ try{ await navigator.clipboard.writeText(m); copy.textContent="Skopiowane ✓"; }catch{ pre.hidden=false; copy.textContent="Zaznacz tekst poniżej"; } };
+    const pre=el("pre",{textContent:m,hidden:true});
+    sendBox.append(el("div",{className:"nav"},tg,copy),pre);
+  });
+  app.replaceChildren(
+    el("div",{}, el("div",{className:"eyebrow",textContent:"Podsumowanie"}), el("h2",{textContent: missing? `Zostało ${missing} do uzupełnienia` : "Gotowe, dziękuję!"})),
+    el("p",{textContent:"Kliknij „Wyślij”, wybierz grupę ze skanerem i wyślij. Claude przepisze ceny do skanera. Każdą odpowiedź możesz jeszcze poprawić, klikając jej nazwę."}),
+    sendBox,
+    list,
+    missing ? el("div",{className:"nav"}, el("button",{type:"button",className:"btn",textContent:"Uzupełnij brakujące",onclick:()=>go(firstOpen())})) : ""
+  );
+  header();
+}
+
+if(state.idx>=0 && state.idx<QUESTIONS.length) question(); else if(state.idx>=QUESTIONS.length) summary(); else intro();
+</script>
+</body>
+</html>
